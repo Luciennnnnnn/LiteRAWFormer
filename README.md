@@ -2,7 +2,7 @@
 
 # 🏆 Winner Solution for NTIRE 2025 RAW Image Super-Resolution Challenge
 
-Tianyu Zhang<sup>1♠️</sup>, Xin Luo<sup>1♠️</sup>, Yeda Chen<sup>2♠️</sup>, Dong Liu<sup>1♠️</sup>
+Tianyu Zhang<sup>1♠️</sup>, Xin Luo<sup>1♠️</sup>, Yeda Chen<sup>2</sup>, Dong Liu<sup>1</sup>
 
 <sup>1</sup> University of Science and Technology of China, Hefei, China
 
