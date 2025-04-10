@@ -2,9 +2,9 @@
 
 # Winner solution for NTIRE 2025 RAW Image SR Challenge
 
-Tianyu Zhang<sup>*</sup>, Xin Luo<sup>*</sup>, Yeda Chen, Dong Liu
+Tianyu Zhang<sup>aaaa*</sup>, Xin Luo<sup>aaaa*</sup>, Yeda Chen, Dong Liu
 
-<sup>*</sup> Equal contribution
+<sup>aaaa*</sup> Equal contribution
 
 [![python](https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![pytorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
