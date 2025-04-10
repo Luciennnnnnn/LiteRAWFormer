@@ -18,8 +18,8 @@ Tianyu Zhang<sup>♠️</sup>, Xin Luo<sup>♠️</sup>, Yeda Chen, Dong Liu
 
 ```bash
 # create a virtual environment [Recommended but optional]
-conda create -n ntire2025_ustc_vidar python=3.11
-source activate ntire2025_ustc_vidar
+conda create -n lite_rawformer python=3.11
+source activate lite_rawformer
 
 # Install necessities
 # In root/
