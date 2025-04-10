@@ -27,7 +27,7 @@ bash install.sh
 ```
 
 ## 2. Inference
-- Download our [pretrained models](https://drive.google.com/drive/folders/1iGS32Qux9mr4SJt2Zb7XTv4Xq6zLEy6I?usp=drive_link), and place the contents in pretrained_models/
+- Download our [pretrained models](), and place the contents in pretrained_models/
 - Download the [validation inputs](https://drive.google.com/file/d/1KF3lCrFZua4hGl9_4Km2uOAnWAv1SjjB/view?usp=sharing), and place it in datasets/RAWSR/
 - Running inference with following command, the results are saved in results/RAWSR/val_out
     ```bash
