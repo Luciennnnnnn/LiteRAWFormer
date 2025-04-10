@@ -31,16 +31,12 @@ model:
     inp_channels: 4
     out_channels: 4
     dim: 40
-    num_blocks: 8 #[4, 6, 6, 8]
-    # num_refinement_blocks: 4
-    # heads: [1, 2, 4, 8]
-    transposed_attn_heads: 8 #[1, 2, 4, 8]
+    num_blocks: 8
+    transposed_attn_heads: 8
     ffn_expansion_factor: !!float 2.7
     bias: False
     LayerNorm_type: WithBias
-    # decoder: true
-    # img_size: 96
-    # scale: 2
+    shuffle_block: [1, 1, 1, 1, 1, 1, 0, 0]
 
 train:
   # Dataloader
