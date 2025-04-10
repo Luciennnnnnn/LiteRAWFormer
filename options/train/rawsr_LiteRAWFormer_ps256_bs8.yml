@@ -1,4 +1,4 @@
-name: rawsr
+name: rawsr_LiteRAWFormer_ps256_bs8
 
 seed: 998244353
 device_specific_seed: true
@@ -26,7 +26,7 @@ data:
 model:
   # pretrained_model_path: ~
 
-  arch_type: mymodel #promptcir_inception
+  arch_type: LiteRAWFormer
   net_opt:
     inp_channels: 4
     out_channels: 4

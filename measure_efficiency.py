@@ -21,7 +21,7 @@ from accelerate.state import AcceleratorState
 
 from rawsr.utils.raw.utils import raw_to_rgb
 from rawsr.dataset.rawsr_dataset import RAWSRValDataset
-from rawsr.models.mymodel import mymodel
+from rawsr.models.lite_rawformer import LiteRAWFormer
 
 
 
@@ -89,7 +89,7 @@ def start_timer():
 def main(args, root_dir):
     accelerator = Accelerator(mixed_precision=args.dtype if args.dtype != 'fp32' else 'no')
 
-    net = mymodel.from_pretrained(args.model_dir)
+    net = LiteRAWFormer.from_pretrained(args.model_dir)
     net = net.to(accelerator.device)
     net.eval()
 

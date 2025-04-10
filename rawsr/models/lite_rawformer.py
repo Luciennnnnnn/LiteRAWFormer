@@ -229,7 +229,7 @@ class TransformerBlock(nn.Module):
         return x
 
 
-class mymodel(ModelMixin, ConfigMixin):
+class LiteRAWFormer(ModelMixin, ConfigMixin):
     @register_to_config
     def __init__(
         self,

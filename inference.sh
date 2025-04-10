@@ -6,7 +6,7 @@ accelerate launch --multi_gpu \
 --num_machines 1 \
 --mixed_precision no \
 --dynamo_backend no \
-inference.py --input_dir ./datasets/RAWSR/val_in --output_dir ./results/RAWSR/val_out --model_dir ./pretrained_models/NTIRE2025_finnal \
+inference.py --input_dir ./datasets/RAWSR/val_in --output_dir ./results/RAWSR/val_out --model_dir ./pretrained_models/LiteRAWFormer \
 --self_ensemble self --dtype fp16
 
 # accelerate launch --multi_gpu \

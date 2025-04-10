@@ -198,12 +198,12 @@ def main(args):
     
     ema_decay = args.train.get('ema_decay', 0)
 
-    from rawsr.models.mymodel import mymodel
+    from rawsr.models.lite_rawformer import LiteRAWFormer
 
     if args.model.get('pretrained_model_path', None) is not None:
-        net = mymodel.from_pretrained(args.model.pretrained_model_path)
+        net = LiteRAWFormer.from_pretrained(args.model.pretrained_model_path)
     else:
-        net = mymodel(
+        net = LiteRAWFormer(
             inp_channels=args.model.net_opt.inp_channels,
             out_channels=args.model.net_opt.out_channels,
             dim=args.model.net_opt.dim,
