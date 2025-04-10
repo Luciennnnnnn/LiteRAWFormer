@@ -14,7 +14,7 @@ Tianyu Zhang<sup>♠️</sup>, Xin Luo<sup>♠️</sup>, Yeda Chen, Dong Liu
 
 <br>
 
-## 🚀 Introduction
+## 📌 Introduction
 
 This repository contains the official implementation of our award-winning solution for the NTIRE 2025 RAW Image Super-Resolution Challenge. Our method achieves state-of-the-art performance with enhanced degradation modeling and efficient architecture design.
 
@@ -57,4 +57,4 @@ If you have any questions, please open an issue (*the recommended way*) or conta
 This work is licensed under MIT license. See the [LICENSE](https://github.com/Luciennnnnnn/LiteRAWFormer/blob/main/LICENSE) for details.
 
 ## Acknowledgement
-Our repository builds upon the excellent framework provided by [accelerate](https://github.com/huggingface/accelerate).
+Our repository builds upon the excellent framework provided by [accelerate](https://github.com/huggingface/accelerate), and our architecture are inspired by [RBSFormer](https://openaccess.thecvf.com/content/CVPR2024W/NTIRE/papers/Jiang_RBSFormer_Enhanced_Transformer_Network_for_Raw_Image_Super-Resolution_CVPRW_2024_paper.pdf).
