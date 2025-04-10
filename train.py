@@ -212,6 +212,7 @@ def main(args):
             ffn_expansion_factor=args.model.net_opt.ffn_expansion_factor,
             bias=args.model.net_opt.bias,
             LayerNorm_type=args.model.net_opt.LayerNorm_type,
+            shuffle_block=tuple(args.model.net_opt.shuffle_block),
         )
     net.train()
 

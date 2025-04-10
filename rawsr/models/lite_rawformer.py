@@ -69,39 +69,51 @@ class LayerNorm(nn.Module):
 
 class InceptionDWConv2d(nn.Module):
     def __init__(
-            self,
-            in_chs,
-            square_kernel_size=3,
-            band_kernel_size=11,
-            branch_ratio=0.125,
-            dilation=1,
+        self,
+        in_chs,
+        square_kernel_size=3,
+        band_kernel_size=11,
+        branch_ratio=0.125,
+        dilation=1,
     ):
         super().__init__()
 
-        gc = int(in_chs * branch_ratio) 
+        gc = int(in_chs * branch_ratio)
         square_padding = get_padding(square_kernel_size, dilation=dilation)
         band_padding = get_padding(band_kernel_size, dilation=dilation)
         self.dwconv_hw = nn.Conv2d(
-            gc, gc, square_kernel_size,
-            padding=square_padding, dilation=dilation, groups=gc)
+            gc,
+            gc,
+            square_kernel_size,
+            padding=square_padding,
+            dilation=dilation,
+            groups=gc,
+        )
         self.dwconv_w = nn.Conv2d(
-            gc, gc, (1, band_kernel_size),
-            padding=(0, band_padding), dilation=(1, dilation), groups=gc)
+            gc,
+            gc,
+            (1, band_kernel_size),
+            padding=(0, band_padding),
+            dilation=(1, dilation),
+            groups=gc,
+        )
         self.dwconv_h = nn.Conv2d(
-            gc, gc, (band_kernel_size, 1),
-            padding=(band_padding, 0), dilation=(dilation, 1), groups=gc)
+            gc,
+            gc,
+            (band_kernel_size, 1),
+            padding=(band_padding, 0),
+            dilation=(dilation, 1),
+            groups=gc,
+        )
         self.split_indexes = (in_chs - 3 * gc, gc, gc, gc)
 
     def forward(self, x):
         x_id, x_hw, x_w, x_h = torch.split(x, self.split_indexes, dim=1)
-        return torch.cat((
-            x_id,
-            self.dwconv_hw(x_hw),
-            self.dwconv_w(x_w),
-            self.dwconv_h(x_h)
-            ), dim=1,
+        return torch.cat(
+            (x_id, self.dwconv_hw(x_hw), self.dwconv_w(x_w), self.dwconv_h(x_h)),
+            dim=1,
         )
-    
+
 
 class FeedForward(nn.Module):
     def __init__(self, dim, ffn_expansion_factor, bias, shuffle):
@@ -109,8 +121,18 @@ class FeedForward(nn.Module):
 
         hidden_features = int(dim * ffn_expansion_factor)
 
-        self.project_in = ShuffleConv1x1(dim, hidden_features * 2) if shuffle else nn.Conv2d(dim, hidden_features * 2, 1, bias=bias)
-        self.gate = nn.Conv2d(hidden_features, hidden_features, kernel_size=3, padding=1, groups=hidden_features)
+        self.project_in = (
+            ShuffleConv1x1(dim, hidden_features * 2)
+            if shuffle
+            else nn.Conv2d(dim, hidden_features * 2, 1, bias=bias)
+        )
+        self.gate = nn.Conv2d(
+            hidden_features,
+            hidden_features,
+            kernel_size=3,
+            padding=1,
+            groups=hidden_features,
+        )
         self.project_out = nn.Conv2d(hidden_features, dim, 1, bias=bias)
 
     def forward(self, x):
@@ -134,21 +156,23 @@ class ChannelShuffle(nn.Module):
         x = x.view(N, G, Cg, H, W).permute(0, 2, 1, 3, 4).contiguous()
         x = x.view(N, C, H, W)
         return x
-    
+
 
 class ShuffleConv1x1(nn.Module):
     def __init__(self, in_channels, out_channels, groups=4):
         super().__init__()
 
         self.groups = groups
-        self.group_conv = nn.Conv2d(in_channels, out_channels, 1, groups=groups, bias=False)
+        self.group_conv = nn.Conv2d(
+            in_channels, out_channels, 1, groups=groups, bias=False
+        )
         self.shuffle = ChannelShuffle(groups)
 
     def forward(self, x):
         x = self.shuffle(x)
         x = self.group_conv(x)
         return x
-    
+
 
 class Attention(nn.Module):
     def __init__(self, dim, num_heads, bias):
@@ -183,27 +207,33 @@ class Attention(nn.Module):
 
         out = attn @ v
 
-        out = rearrange(out, "b head c (h w) -> b (head c) h w", head=self.num_heads, h=h, w=w)
+        out = rearrange(
+            out, "b head c (h w) -> b (head c) h w", head=self.num_heads, h=h, w=w
+        )
 
         out = self.project_out(out)
         return out
 
-    
+
 class Upsample(nn.Module):
     def __init__(self, in_ch, out_ch):
         super(Upsample, self).__init__()
 
         self.body = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch * 4, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                in_ch, out_ch * 4, kernel_size=3, stride=1, padding=1, bias=False
+            ),
             nn.PixelShuffle(2),
         )
 
     def forward(self, x):
         return self.body(x)
-    
+
 
 class TransformerBlock(nn.Module):
-    def __init__(self, dim, num_heads, ffn_expansion_factor, bias, LayerNorm_type, shuffle):
+    def __init__(
+        self, dim, num_heads, ffn_expansion_factor, bias, LayerNorm_type, shuffle
+    ):
         super(TransformerBlock, self).__init__()
 
         self.norm1 = LayerNorm(dim, LayerNorm_type)
@@ -216,24 +246,24 @@ class TransformerBlock(nn.Module):
         x = x + self.ffn(self.norm2(x))
 
         return x
-    
+
 
 class LiteRAWFormer(ModelMixin, ConfigMixin):
     @register_to_config
     def __init__(
         self,
-        inp_channels=4,
-        out_channels=4,
-        dim=40,
-        num_blocks=8,
-        transposed_attn_heads=8,
-        ffn_expansion_factor=2.7,
-        bias=False,
-        LayerNorm_type="WithBias", 
-        shuffle_block=[1, 1, 1, 1, 1, 1, 0, 0], 
+        inp_channels: int = 4,
+        out_channels: int = 4,
+        dim: int = 40,
+        num_blocks: int = 8,
+        transposed_attn_heads: int = 8,
+        ffn_expansion_factor: float = 2.7,
+        bias: bool = False,
+        LayerNorm_type: str = "WithBias",
+        shuffle_block: tuple[int] = (1, 1, 1, 1, 1, 1, 0, 0),
     ):
         super().__init__()
-        
+
         self.conv_in = nn.Conv2d(inp_channels, int(dim * 2**2), 3, 1, 1)
         self.decoder = nn.Sequential(
             *[
@@ -243,7 +273,7 @@ class LiteRAWFormer(ModelMixin, ConfigMixin):
                     ffn_expansion_factor=ffn_expansion_factor,
                     bias=bias,
                     LayerNorm_type=LayerNorm_type,
-                    shuffle=shuffle_block[i]
+                    shuffle=shuffle_block[i],
                 )
                 for i in range(num_blocks)
             ]
@@ -262,8 +292,5 @@ class LiteRAWFormer(ModelMixin, ConfigMixin):
             nn.init.constant_(m.bias, 0)
             nn.init.constant_(m.weight, 1.0)
 
-
     def forward(self, inp_img):
-
         return self.up(self.decoder(self.conv_in(inp_img))) + self.skip(inp_img)
-
