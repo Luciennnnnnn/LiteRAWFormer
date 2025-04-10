@@ -2,7 +2,7 @@
 
 # Winner solution for NTIRE 2025 RAW Image SR Challenge
 
-$\text{Tianyu Zhang}^*$, $\text{Xin Luo}^*$, $\text{Yeda Chen}$, $\text{Dong Liu}$
+Tianyu Zhang<sup>*</sup>, Xin Luo<sup>*</sup>, Yeda Chen, Dong Liu
 
 <sup>*</sup> Equal contribution
 
