@@ -3,8 +3,11 @@
 # 🏆 Winner Solution for NTIRE 2025 RAW Image Super-Resolution Challenge
 
 Tianyu Zhang<sup>1♠️</sup>, Xin Luo<sup>1♠️</sup>, Yeda Chen<sup>2♠️</sup>, Dong Liu<sup>1♠️</sup>
-<sup>1</sup> University of Science and Technology of China, Hefei, China \\
+
+<sup>1</sup> University of Science and Technology of China, Hefei, China
+
 <sup>2</sup> Shanghai Shuangshen Information Technology Co., Ltd.
+
 <sup>♠️</sup> Equal contribution
 
 [![python](https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
