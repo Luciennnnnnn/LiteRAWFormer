@@ -1,6 +1,6 @@
 <div align="center">
 
-# Winner solution for NTIRE 2025 RAW Image SR Challenge
+# 🏆 Winner Solution for NTIRE 2025 RAW Image Super-Resolution Challenge
 
 Tianyu Zhang<sup>♠️</sup>, Xin Luo<sup>♠️</sup>, Yeda Chen, Dong Liu
 
@@ -14,19 +14,23 @@ Tianyu Zhang<sup>♠️</sup>, Xin Luo<sup>♠️</sup>, Yeda Chen, Dong Liu
 
 <br>
 
-## 1. Installation
+## 🚀 Introduction
+
+This repository contains the official implementation of our award-winning solution for the NTIRE 2025 RAW Image Super-Resolution Challenge. Our method achieves state-of-the-art performance with enhanced degradation modeling and efficient architecture design.
+
+## 📦 Installation
 
 ```bash
 # create a virtual environment [Recommended but optional]
 conda create -n lite_rawformer python=3.11
 source activate lite_rawformer
 
-# Install necessities
+# Install all necessary dependencies
 # In root/
 bash install.sh
 ```
 
-## 2. Inference
+## :rocket: Inference
 - Download our [pretrained models](https://drive.google.com/drive/folders/1yBwFUOOS74O5Okyn58G9te8hfOu--Unl?usp=sharing), and place the contents in pretrained_models/
 - Download the [validation inputs](https://drive.google.com/file/d/1KF3lCrFZua4hGl9_4Km2uOAnWAv1SjjB/view?usp=sharing), and place it in datasets/RAWSR/
 - Running inference with following command, the results are saved in results/RAWSR/val_out
@@ -36,7 +40,7 @@ bash install.sh
     ```
 - To evaluate the results, you should register [NTIRE 2025 RAW Restoration Challenge](https://codalab.lisn.upsaclay.fr/competitions/21644#learn_the_details) and upload your results to the platform.
 
-## 3. Training
+## :boat: Training
 - Download the [Training set](https://drive.google.com/file/d/1rUno3LXfGw013g1EfUvPX1bbpBMyLZEU/view?usp=sharing), and place it in datasets/RAWSR/
 - Running training with following command.
     ```bash
@@ -44,4 +48,13 @@ bash install.sh
     bash train.sh # use all available GPUs
     CUDA_VISIBLE_DEVICES=0,1 bash train.sh # use the first two GPUs
     ```
+## :email: Contact
+If you have any questions, please open an issue (*the recommended way*) or contact us via 
+- xinluo@mail.ustc.edu.cn
+- zhangtianyu@mail.ustc.edu.cn
 
+## License
+This work is licensed under MIT license. See the [LICENSE](https://github.com/Luciennnnnnn/LiteRAWFormer/blob/main/LICENSE) for details.
+
+## Acknowledgement
+Our repository builds upon the excellent framework provided by [accelerate](https://github.com/huggingface/accelerate).
