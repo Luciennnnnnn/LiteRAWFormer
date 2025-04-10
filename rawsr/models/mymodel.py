@@ -274,5 +274,4 @@ class mymodel(ModelMixin, ConfigMixin):
 
 
     def forward(self, inp_img, noise_emb=None):
-
         return self.up(self.decoder(self.conv_in(inp_img))) + self.skip(inp_img)

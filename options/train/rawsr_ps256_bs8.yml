@@ -1,0 +1,106 @@
+name: rawsr
+
+seed: 998244353
+device_specific_seed: true
+workder_specific_seed: true
+
+data:
+  train_data_dir: datasets/RAWSR/train_raws
+  val_data_dir: datasets/RAWSR/val_in
+
+  bayer_pattern_in: RGGB
+  bayer_pattern_out: RGGB
+
+  gt_size: 256
+  scale: 2
+
+  use_hflip: true
+  use_rot: false
+
+  degradation_pipeline: bsraw
+  kernel_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+  psf_kernel_prob: 0.5
+  pyblur_psf_kernel_prob: 0.1
+
+model:
+  # pretrained_model_path: ~
+
+  arch_type: mymodel #promptcir_inception
+  net_opt:
+    inp_channels: 4
+    out_channels: 4
+    dim: 40
+    num_blocks: 8 #[4, 6, 6, 8]
+    # num_refinement_blocks: 4
+    # heads: [1, 2, 4, 8]
+    transposed_attn_heads: 8 #[1, 2, 4, 8]
+    ffn_expansion_factor: !!float 2.7
+    bias: False
+    LayerNorm_type: WithBias
+    # decoder: true
+    # img_size: 96
+    # scale: 2
+
+train:
+  # Dataloader
+  batch_size: 8
+  # num_train_epochs: 4
+  max_train_steps: 200000
+  
+  dataloader_num_workers: 12
+
+  # Optimizer
+  learning_rate: !!float 1e-4
+  scale_lr: false
+  lr_scheduler: timm_cosine
+  t_initial: 300000
+  lr_min: 1e-6
+  cycle_decay: 0.5
+  warmup_t: 0
+  warmup_lr_init: 1e-5
+  warmup_prefix: true
+  t_in_epochs: false
+
+  gradient_accumulation_steps: 1
+  # resume_from_checkpoint: 
+
+  use_8bit_adam: false
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_weight_decay: !!float 0.01
+  adam_epsilon: !!float 1e-08
+  max_grad_norm: 1
+
+  gradient_checkpointing: false
+  set_grads_to_none: true
+
+  # Misc
+  allow_tf32: false
+  mixed_precision: 'no'
+
+  ema_decay: 0.9999
+
+  loss_opt:
+    loss_opt:
+      loss_func: charbonnier
+      charbonnier_eps: !!float 1e-4
+  
+  frequency_loss_weight: 0.5
+  
+  # caption_opt:
+  #   captioner: ram
+      
+val:
+  validation_steps: 5000
+  train_visualization_steps: 5000
+  
+logger:
+  # log_with: wandb
+  log_with: ~
+
+  checkpointing_steps: 500
+  checkpoints_total_limit: 2
+
+cache_dir: 
+resume_from_checkpoint: latest

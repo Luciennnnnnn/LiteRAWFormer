@@ -1,5 +1,3 @@
-conda create -n ntire2025_ustc_vidar python=3.11
-
 pip install torch torchvision torchaudio xformers
 
 packages=(
@@ -18,11 +16,7 @@ done
 packages=(
 diffusers[torch]
 accelerate
-datasets
 transformers
-peft
-loralib
-fairscale
 einops
 timm
 )
