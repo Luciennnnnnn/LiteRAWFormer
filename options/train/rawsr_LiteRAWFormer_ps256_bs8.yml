@@ -88,8 +88,8 @@ train:
   #   captioner: ram
       
 val:
-  validation_steps: 5000
-  train_visualization_steps: 5000
+  validation_steps: 500
+  train_visualization_steps: 500
   
 logger:
   # log_with: wandb

@@ -1,7 +1,7 @@
 # !/bin/bash
 
 experiments=(
-rawsr_ps256_bs8
+rawsr_LiteRAWFormer_ps256_bs8
 )
 
 for((i=0;i<${#experiments[@]};i++))

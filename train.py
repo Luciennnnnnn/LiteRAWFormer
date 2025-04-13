@@ -45,13 +45,14 @@ import accelerate
 from accelerate import Accelerator
 from accelerate.state import AcceleratorState
 from accelerate.logging import get_logger
-from accelerate.utils import ProjectConfiguration, set_seed
+from accelerate.utils import ProjectConfiguration, set_seed, DistributedType
 
 import transformers
 
 import diffusers
 from diffusers.optimization import get_scheduler
-from diffusers.training_utils import EMAModel
+# from diffusers.training_utils import EMAModel
+from rawsr.training_utils import EMAModel
 from diffusers.utils import is_wandb_available
 from diffusers.utils.torch_utils import is_compiled_module
 
@@ -234,7 +235,7 @@ def main(args):
         net.enable_gradient_checkpointing()
 
     # `accelerate` 0.16.0 will have better support for customized saving
-    if version.parse(accelerate.__version__) >= version.parse("0.16.0"):
+    if version.parse(accelerate.__version__) >= version.parse("0.16.0") and accelerator.distributed_type not in [DistributedType.FSDP, DistributedType.DEEPSPEED]:
         # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
         def save_model_hook(models, weights, output_dir):
             if accelerator.is_main_process:
@@ -369,6 +370,8 @@ def main(args):
         net, optimizer, train_dataloader, lr_scheduler
     )
 
+    # print(f"{net=}")
+
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.train.gradient_accumulation_steps)
     if overrode_max_train_steps:
@@ -446,8 +449,6 @@ def main(args):
         for step, batch in enumerate(train_dataloader):
             lq_raw, gt_raw = batch['lq_raw'], batch['gt_raw']
             
-            print(f"{lq_raw.dtype=}")
-            print(f"{gt_raw.dtype=}")
             with accelerator.accumulate(net):
                 model_pred = net(lq_raw)
                 
@@ -497,13 +498,15 @@ def main(args):
                     
                 global_step += 1
 
-                if accelerator.is_main_process:
-                    if global_step % args.logger.checkpointing_steps == 0:
+                if global_step % args.logger.checkpointing_steps == 0:
+                    if accelerator.is_main_process:
                         # _before_ saving state, check if this save would set us over the `checkpoints_total_limit`
                         if args.logger.checkpoints_total_limit is not None:
                             checkpoints = os.listdir(args.output_dir)
                             checkpoints = [d for d in checkpoints if d.startswith("checkpoint")]
                             checkpoints = sorted(checkpoints, key=lambda x: int(x.split("-")[1]))
+
+                            print(f"{len(checkpoints)=} {checkpoints=} {args.logger.checkpoints_total_limit=}")
 
                             # before we save the new checkpoint, we need to have at _most_ `checkpoints_total_limit - 1` checkpoints
                             if len(checkpoints) >= args.logger.checkpoints_total_limit:
@@ -518,18 +521,24 @@ def main(args):
                                 for removing_checkpoint in removing_checkpoints:
                                     removing_checkpoint = os.path.join(args.output_dir, removing_checkpoint)
                                     shutil.rmtree(removing_checkpoint)
-
-                        save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
-                        accelerator.save_state(save_path)
-                        logger.info(f"Saved state to {save_path}")
+                                    
+                    accelerator.wait_for_everyone()
+                    save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}")
+                    accelerator.save_state(save_path)
+                    logger.info(f"Saved state to {save_path}")
                     
-                    if 'visualization_steps' in args.val and (global_step - 1) % args.val.train_visualization_steps == 0:
+                if accelerator.is_main_process:
+                    if 'train_visualization_steps' in args.val and (global_step - 1) % args.val.train_visualization_steps == 0:
                         with torch.no_grad():
                             lq_rgb = batch['lq_rgb'][:3]
-                            gt_rgb = batch['lq_rgb'][:3]
+                            gt_rgb = batch['gt_rgb'][:3]
                             sr_raw = model_pred[:3]
                             sr_raw = torch.clamp(sr_raw * 0.5 + 0.5, 0, 1)
                             sr_rgb = raw_to_rgb(sr_raw)
+
+                            lq_rgb = F.interpolate(lq_rgb, scale_factor=args.data.scale, mode='bilinear', align_corners=False)
+                            lq_rgb = lq_rgb * 0.5 + 0.5
+                            gt_rgb = gt_rgb * 0.5 + 0.5
 
                             image = torch.cat([lq_rgb, gt_rgb, sr_rgb], dim=0)
 
@@ -537,39 +546,39 @@ def main(args):
                             for i in range(3):
                                 image_grid = make_grid(image[i::3], nrow=image[i::3].shape[0])
                                 image_grid = to_pil_image(image_grid)
-                                image_grid.save(os.path.join(args.output_dir, f"train_visualization_{global_step}_{i}png"))
+                                image_grid.save(os.path.join(args.output_dir, f"train_visualization_{global_step}_{i}.png"))
 
                 # if accelerator.is_main_process:
-                if args.val.validation_steps != -1 and (global_step - 1) % args.val.validation_steps == 0:
-                    if ema_decay != 0:
-                        # Store the Controlnet parameters temporarily and load the EMA parameters to perform inference.
-                        net_ema.store(net.parameters())
-                        net_ema.copy_to(net.parameters())
+                # if args.val.validation_steps != -1 and (global_step - 1) % args.val.validation_steps == 0:
+                #     if ema_decay != 0:
+                #         # Store the Controlnet parameters temporarily and load the EMA parameters to perform inference.
+                #         net_ema.store(net.parameters())
+                #         net_ema.copy_to(net.parameters())
 
-                        validation(
-                            val_dataset,
-                            net,
-                            args,
-                            accelerator,
-                            global_step,
-                            True,
-                            process_index,
-                            num_processes
-                        )
+                #         validation(
+                #             val_dataset,
+                #             net,
+                #             args,
+                #             accelerator,
+                #             global_step,
+                #             True,
+                #             process_index,
+                #             num_processes
+                #         )
                         
-                        # Switch back to the original transformer parameters.
-                        net_ema.restore(net.parameters())
+                #         # Switch back to the original transformer parameters.
+                #         net_ema.restore(net.parameters())
 
-                    validation(
-                        val_dataset,
-                        net,
-                        args,
-                        accelerator,
-                        global_step,
-                        False,
-                        process_index,
-                        num_processes
-                    )
+                #     validation(
+                #         val_dataset,
+                #         net,
+                #         args,
+                #         accelerator,
+                #         global_step,
+                #         False,
+                #         process_index,
+                #         num_processes
+                #     )
                 progress_bar.set_postfix(**logs)
                 progress_bar.update(1)
 
