@@ -50,7 +50,7 @@ train:
   learning_rate: !!float 1e-4
   scale_lr: false
   lr_scheduler: timm_cosine
-  t_initial: 300000
+  t_initial: 200000
   lr_min: 1e-6
   cycle_decay: 0.5
   warmup_t: 0
@@ -95,7 +95,7 @@ logger:
   # log_with: wandb
   log_with: ~
 
-  checkpointing_steps: 500
+  checkpointing_steps: 20
   checkpoints_total_limit: 2
 
 cache_dir: 

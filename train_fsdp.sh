@@ -26,6 +26,6 @@ do
     --fsdp_use_orig_params True \
     --fsdp_cpu_ram_efficient_loading false \
     --fsdp_sync_module_states True \
-    train.py --config options/train/${experiments[i]}.yml
+    train_fsdp.py --config options/train/${experiments[i]}.yml
     # --fsdp_state_dict_type SHARDED_STATE_DICT \
 done

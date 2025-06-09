@@ -10,9 +10,15 @@ Tianyu Zhang<sup>1♠️</sup>, Xin Luo<sup>1♠️</sup>, Yeda Chen<sup>2</sup>
 
 <sup>♠️</sup> Equal contribution
 
-[![python](https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
+<a href="https://www.arxiv.org/abs/2506.02197">
+    <img alt="Build" src="https://img.shields.io/badge/arXiv%20paper-2506.02197-b31b1b.svg">
+</a>
+
+<!-- [![arxiv](https://img.shields.io/badge/arXiv%20paper-2409.11340-b31b1b.svg)](https://arxiv.org/abs/2409.11340) -->
+
+<!-- [![python](https://img.shields.io/badge/-Python_3.11-blue?logo=python&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![pytorch](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch&logoColor=white)](https://pytorch.org/get-started/locally/)
-[![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](#license)
+[![license](https://img.shields.io/badge/License-MIT-green.svg?labelColor=gray)](#license) -->
 
 </div>
 
